@@ -1,0 +1,98 @@
+package com.lojaunitAJ.controller;
+
+import java.sql.Date;
+import java.util.Optional;
+
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import com.lojaunitAJ.entidade.Clientes;
+import com.lojaunitAJ.repository.clientesRepository;
+
+@Controller
+@RequestMapping(path = "/clientes")
+public class ClienteController {
+	@Autowired
+	private clientesRepository clienteRepository;
+		
+	@RequestMapping(path = "/add", method = RequestMethod.POST)
+	/*public @ResponseBody String addNewCliente(@RequestParam String nome, @RequestParam String cpf,
+			@RequestParam String email, @RequestParam Date dataNascimento, @RequestParam String sexo,
+			@RequestParam String nomeSocial, @RequestParam String apelido, @RequestParam String telefone) */
+	public @ResponseBody Clientes addNewCliente(@RequestBody @Valid Clientes cliente) {
+
+		/*Clientes cliente = new Clientes();
+		cliente.setNome(nome);
+		cliente.setCpf(cpf);
+		cliente.setEmail(email);
+		cliente.setDataNascimento(dataNascimento);
+		cliente.setSexo(sexo);
+		cliente.setNomeSocial(nomeSocial);
+		cliente.setApelido(apelido);
+		cliente.setTelefone(telefone); */
+		clienteRepository.save(cliente);
+		
+		return cliente;
+	}
+
+	@GetMapping
+	public @ResponseBody Iterable<Clientes> getAllClientes() {
+		return clienteRepository.findAll();
+	}
+
+	@GetMapping(path = "/find/{id}")
+	public @ResponseBody Optional<Clientes> getClienteById(@PathVariable("id") Integer id) {
+		return clienteRepository.findById(id);
+	}
+
+	@DeleteMapping(path = "/delete/{id}")
+	public @ResponseBody String deleteClienteById(@PathVariable("id") Integer id) {
+		if (clienteRepository.existsById(id)) {
+			clienteRepository.deleteById(id);
+			return "Cliente apagado com Sucesso";
+		}
+		return "Cliente não Encontrado!";
+	}
+
+	@DeleteMapping(path = "/delete/all")
+	public @ResponseBody String deleteAll() {
+		clienteRepository.deleteAll();
+		return "O conteúdo da Tabela Clientes Apagado com Sucesso!";
+	}
+
+	@PutMapping(path = "/update/{id}")
+	public @ResponseBody String updateClienteById(@RequestParam String nome, @RequestParam String cpf,
+			@RequestParam String email, @RequestParam Date dataNascimento, @RequestParam String sexo,
+			@RequestParam String nomeSocial, @RequestParam String apelido, @RequestParam String telefone,
+			@PathVariable("id") Integer id) {
+
+		if (clienteRepository.existsById(id)) {
+			Clientes cliente = new Clientes();
+			cliente.setId(id);
+			cliente.setNome(nome);
+			cliente.setCpf(cpf);
+			cliente.setEmail(email);
+			cliente.setDataNascimento(dataNascimento);
+			cliente.setSexo(sexo);
+			cliente.setNomeSocial(nomeSocial);
+			cliente.setApelido(apelido);
+			cliente.setTelefone(telefone);
+			clienteRepository.save(cliente);
+			
+			return "Cliente Atualizado com Sucesso!";
+		}
+
+		return "Cliente Não Encontrado";
+	}
+
+}
